@@ -3,11 +3,13 @@ Web server for github webhooks.
 
 ## Usage
  ```
+  -addr string
+        local address to listen on (default "127.0.0.1")
   -c string
         config path (default "/etc/github-webhooks/config")
   -h    show this help
   -port int
-        local port to listen. (default 9966)
+        local port to listen on. (default 9966)
 ```
 
 ## Config

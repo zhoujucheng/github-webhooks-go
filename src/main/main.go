@@ -27,6 +27,7 @@ var (
 	c        string
 	port     int
 	h        bool
+	addr     string
 	hooksMap = make(map[string]HooksInfo)
 )
 
@@ -120,7 +121,8 @@ func hookHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	flag.StringVar(&c, "c", "/etc/github-webhooks/config", "config path")
 	flag.BoolVar(&h, "h", false, "show this help")
-	flag.IntVar(&port, "port", 9966, "local port to listen.")
+	flag.IntVar(&port, "port", 9966, "local port to listen on.")
+	flag.StringVar(&addr, "addr", "127.0.0.1", "local address to listen on")
 	flag.Parse()
 
 	if h {
@@ -137,5 +139,5 @@ func main() {
 		http.HandleFunc(path, hookHandler)
 	}
 
-	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(port), nil))
+	log.Fatal(http.ListenAndServe(addr+":"+strconv.Itoa(port), nil))
 }
