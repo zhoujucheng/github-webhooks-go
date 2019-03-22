@@ -64,6 +64,7 @@ func readConfig(configPath string) error {
 }
 
 func hookHandler(w http.ResponseWriter, r *http.Request) {
+	r.Body = http.MaxBytesReader(w, r.Body, 1024*1024)
 	defer r.Body.Close()
 	event := r.Header.Get("X-GitHub-Event")
 	signature := r.Header.Get("X-Hub-Signature")
@@ -82,7 +83,8 @@ func hookHandler(w http.ResponseWriter, r *http.Request) {
 
 	_, hashErr := hash.Write(body)
 	if hashErr != nil {
-		w.Write([]byte("HTTP/2 500 error\n"))
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("500 internal server error\n"))
 		return
 	}
 	signature1 := hex.EncodeToString(hash.Sum(nil))
@@ -94,7 +96,8 @@ func hookHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if signature1 != signature[5:] {
-		w.Write([]byte("HTTP/2 400 bad request\n"))
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("400 bad request\n"))
 		return
 	}
 
@@ -114,8 +117,7 @@ func hookHandler(w http.ResponseWriter, r *http.Request) {
 	if cmdErr != nil {
 		fmt.Println("error: " + cmdErr.Error())
 	}
-
-	w.Write([]byte("HTTP/2 200 ok\n"))
+	w.WriteHeader(http.StatusOK)
 }
 
 func main() {
